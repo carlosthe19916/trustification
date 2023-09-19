@@ -1,0 +1,1 @@
+export const mainPageTable = "table.pf-v5-c-table";
