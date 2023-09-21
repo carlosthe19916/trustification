@@ -1,0 +1,55 @@
+name: Spog UI E2E Tests
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+            bommer/bommer-ui/target/
+            spog/ui/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create containers
+        run: |
+          # Create backend containers
+          docker build -f trust/Containerfile -t trust:latest .
+          
+          # Create Spog UI container
+          docker build -f spog/ui/Containerfile -t spog-ui:latest .
+
+      - name: Compose
+        working-directory: deploy/compose
+        run: |
+          TRUST_IMAGE=trust TRUST_VERSION=latest TRUST_UI_IMAGE=spog-ui docker-compose -f compose.yaml -f compose-guac.yaml -f compose-trustification.yaml -f compose-collectors.yaml up -d --force-recreate
+
+      - name: Spog UI Test
+        uses: cypress-io/github-action@v6
+        with:
+          CYPRESS_spogUiUrl: http://localhost:8084
+
+      - name: Print logs
+        if: always()
+        run: |
+          docker ps -a
+          docker-compose -f deploy/compose/compose.yaml -f deploy/compose/compose-guac.yaml -f deploy/compose/compose-trustification.yaml -f deploy/compose/compose-collectors.yaml logs
+          docker-compose -f deploy/compose/compose.yaml -f deploy/compose/compose-guac.yaml -f deploy/compose/compose-trustification.yaml -f deploy/compose/compose-collectors.yaml down
