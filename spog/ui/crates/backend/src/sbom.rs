@@ -1,4 +1,5 @@
 use crate::{ApplyAccessToken, Backend, Endpoint};
+use futures::future::try_join_all;
 use reqwest::StatusCode;
 use spog_model::prelude::SbomReport;
 use spog_ui_common::error::*;
@@ -47,6 +48,15 @@ impl SBOMService {
         }
 
         Ok(Some(response.error_for_status()?.text().await?))
+    }
+
+    pub async fn get_batch(&self, ids: &Vec<impl AsRef<str>>) -> Result<Vec<Option<String>>, Error> {
+        let mut futures = Vec::new();
+        for id in ids {
+            let future = self.get(id);
+            futures.push(future);
+        }
+        try_join_all(futures).await
     }
 
     pub async fn get_sbom_vulns(&self, id: impl AsRef<str>) -> Result<Option<SbomReport>, Error> {

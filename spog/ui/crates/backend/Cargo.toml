@@ -41,6 +41,7 @@ trustification-common = { path = "../../../../common", default-features = false 
 trustification-version = { path = "../../../../version" }
 v11y-model = { path = "../../../../v11y/model" }
 vexination-model = { path = "../../../../vexination/model" }
+futures = "0.3.28"
 
 [dependencies.web-sys]
 version = "0.3.61"
