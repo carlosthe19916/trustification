@@ -12,7 +12,7 @@ pub struct GetParams {
 
 #[utoipa::path(
     get,
-    path = "/api/v1/package",
+    path = "/api/v1/sbom",
     responses(
         (status = 200, description = "Package was found"),
         (status = NOT_FOUND, description = "Package was not found")

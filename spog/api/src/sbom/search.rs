@@ -9,7 +9,7 @@ use trustification_auth::client::TokenProvider;
 
 #[utoipa::path(
     get,
-    path = "/api/v1/package/search",
+    path = "/api/v1/sbom/search",
     responses(
         (status = 200, description = "Search was performed successfully"),
     ),

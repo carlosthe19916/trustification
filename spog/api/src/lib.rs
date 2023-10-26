@@ -11,12 +11,14 @@ use trustification_infrastructure::{
     Infrastructure, InfrastructureConfig,
 };
 use url::Url;
+use url::Url;
 
 mod advisory;
 mod analytics;
 mod analyze;
 mod config;
 mod cve;
+mod package;
 mod endpoints;
 mod error;
 mod guac;

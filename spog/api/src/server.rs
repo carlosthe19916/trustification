@@ -6,7 +6,7 @@ use crate::error::Error;
 use crate::{
     advisory,
     analyze::{self, CrdaClient},
-    config, cve, endpoints,
+    config, cve, package, endpoints,
     guac::service::GuacService,
     index, sbom,
     service::{collectorist::CollectoristService, v11y::V11yService},
@@ -39,31 +39,31 @@ pub struct Server {
 
 #[derive(OpenApi)]
 #[openapi(
-        paths(
-            sbom::get,
-            sbom::search,
-            advisory::get,
-            advisory::search,
-            trustification_version::version::version_fn,
-            crate::guac::get,
-        ),
-        components(
-            //schemas(search::PackageSummary, search::VulnSummary, search::SearchResult<Vec<search::PackageSummary>>)
-            schemas(
-                search::PackageSummary,
-                trustification_api::search::SearchResult<Vec<search::PackageSummary>>,
-                trustification_version::VersionInformation,
-                trustification_version::Version,
-                trustification_version::Git,
-                trustification_version::Build,
-            )
-        ),
-        tags(
-            (name = "package", description = "Package endpoints"),
-            (name = "advisory", description = "Advisory endpoints"),
-          //  (name = "vulnerability", description = "Vulnerability endpoints"),
-        ),
-    )]
+paths(
+sbom::get,
+sbom::search,
+advisory::get,
+advisory::search,
+trustification_version::version::version_fn,
+crate::guac::get,
+),
+components(
+//schemas(search::PackageSummary, search::VulnSummary, search::SearchResult<Vec<search::PackageSummary>>)
+schemas(
+search::PackageSummary,
+trustification_api::search::SearchResult < Vec < search::PackageSummary >>,
+trustification_version::VersionInformation,
+trustification_version::Version,
+trustification_version::Git,
+trustification_version::Build,
+)
+),
+tags(
+(name = "package", description = "Package endpoints"),
+(name = "advisory", description = "Advisory endpoints"),
+//  (name = "vulnerability", description = "Vulnerability endpoints"),
+),
+)]
 pub struct ApiDoc;
 
 impl Server {
@@ -140,6 +140,7 @@ impl Server {
                     .configure(advisory::configure(authenticator.clone()))
                     .configure(crate::guac::configure(authenticator.clone()))
                     .configure(cve::configure(authenticator.clone()))
+                    .configure(package::configure(authenticator.clone()))
                     .configure(config_configurator.clone())
                     .service({
                         let mut openapi = ApiDoc::openapi();
@@ -166,7 +167,7 @@ impl Server {
         let http = Box::pin(async move {
             http.run().await?;
             Ok(())
-        }) as Pin<Box<dyn Future<Output = anyhow::Result<()>>>>;
+        }) as Pin<Box<dyn Future<Output=anyhow::Result<()>>>>;
 
         let mut tasks = vec![http];
 
@@ -196,7 +197,7 @@ impl AppState {
         &self,
         id: &str,
         provider: &dyn TokenProvider,
-    ) -> Result<impl futures::Stream<Item = reqwest::Result<bytes::Bytes>>, Error> {
+    ) -> Result<impl futures::Stream<Item=reqwest::Result<bytes::Bytes>>, Error> {
         let url = self.bombastic.join("/api/v1/sbom")?;
         let response = self
             .client
@@ -245,7 +246,7 @@ impl AppState {
         &self,
         id: &str,
         provider: &dyn TokenProvider,
-    ) -> Result<impl futures::Stream<Item = reqwest::Result<bytes::Bytes>>, Error> {
+    ) -> Result<impl futures::Stream<Item=reqwest::Result<bytes::Bytes>>, Error> {
         let url = self.vexination.join("/api/v1/vex")?;
         let response = self
             .client
