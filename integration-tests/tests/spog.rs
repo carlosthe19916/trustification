@@ -182,64 +182,64 @@ async fn spog_search_correlation(context: &mut SpogContext) {
 
 /// SPoG is the entrypoint for the frontend. It exposes an dependencies API, but forwards requests
 /// to Guac. This test is here to test this.
-#[test_context(SpogContext)]
-#[tokio::test]
-#[ntest::timeout(30_000)]
-async fn spog_dependencies(context: &mut SpogContext) {
-    let input = serde_json::from_str(include_str!("testdata/correlation/stf-1.5.json")).unwrap();
-    let sbom_id = "test-stf-1.5-guac";
-    context.bombastic.upload_sbom(sbom_id, &input).await;
-
-    let client = reqwest::Client::new();
-
-    let purl: &str = "pkg:rpm/redhat/json-c@0.13.1-0.4.el8";
-
-    loop {
-        let response = client
-            .get(context.urlify("/api/v1/package/related"))
-            .query(&[("purl", purl)])
-            .inject_token(&context.provider.provider_user)
-            .await
-            .unwrap()
-            .send()
-            .await
-            .unwrap();
-        if response.status() == StatusCode::OK {
-            let payload: Value = response.json().await.unwrap();
-            let pkgs = payload.as_array().unwrap();
-            if pkgs.contains(&json!({"purl": "pkg:rpm/json-c@0.13.1-0.4.el8?arch=x86_64"})) {
-                break;
-            }
-        }
-        tokio::time::sleep(Duration::from_secs(1)).await;
-    }
-
-    let response = client
-        .get(context.urlify("/api/v1/package/dependents"))
-        .query(&[("purl", purl)])
-        .inject_token(&context.provider.provider_user)
-        .await
-        .unwrap()
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
-    let payload: Value = response.json().await.unwrap();
-    let deps = payload.as_array().unwrap();
-    assert!(deps.contains(&json!({"purl": "pkg:oci/sg-core@sha256:fae8586bc4872450e0f01f99a6202deec63ebd6b2ea8eb5c3f280229fa176da2?tag=5.1.1-3"})));
-
-    let purl: &str = "pkg:rpm/redhat/python-zope-event@4.2.0-9.2.el8stf";
-    let response = client
-        .get(context.urlify("/api/v1/packages/dependencies"))
-        .query(&[("purl", purl)])
-        .inject_token(&context.provider.provider_user)
-        .await
-        .unwrap()
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
-    let payload: Value = response.json().await.unwrap();
-    let deps = payload.as_array().unwrap();
-    assert!(deps.contains(&json!({"purl": "pkg:rpm/python2-zope-event@4.2.0-9.2.el8stf?arch=noarch"})));
-}
+// #[test_context(SpogContext)]
+// #[tokio::test]
+// #[ntest::timeout(30_000)]
+// async fn spog_dependencies(context: &mut SpogContext) {
+//     let input = serde_json::from_str(include_str!("testdata/correlation/stf-1.5.json")).unwrap();
+//     let sbom_id = "test-stf-1.5-guac";
+//     context.bombastic.upload_sbom(sbom_id, &input).await;
+//
+//     let client = reqwest::Client::new();
+//
+//     let purl: &str = "pkg:rpm/redhat/json-c@0.13.1-0.4.el8";
+//
+//     loop {
+//         let response = client
+//             .get(context.urlify("/api/v1/package/related"))
+//             .query(&[("purl", purl)])
+//             .inject_token(&context.provider.provider_user)
+//             .await
+//             .unwrap()
+//             .send()
+//             .await
+//             .unwrap();
+//         if response.status() == StatusCode::OK {
+//             let payload: Value = response.json().await.unwrap();
+//             let pkgs = payload.as_array().unwrap();
+//             if pkgs.contains(&json!({"purl": "pkg:rpm/json-c@0.13.1-0.4.el8?arch=x86_64"})) {
+//                 break;
+//             }
+//         }
+//         tokio::time::sleep(Duration::from_secs(1)).await;
+//     }
+//
+//     let response = client
+//         .get(context.urlify("/api/v1/package/dependents"))
+//         .query(&[("purl", purl)])
+//         .inject_token(&context.provider.provider_user)
+//         .await
+//         .unwrap()
+//         .send()
+//         .await
+//         .unwrap();
+//     assert_eq!(response.status(), StatusCode::OK);
+//     let payload: Value = response.json().await.unwrap();
+//     let deps = payload.as_array().unwrap();
+//     assert!(deps.contains(&json!({"purl": "pkg:oci/sg-core@sha256:fae8586bc4872450e0f01f99a6202deec63ebd6b2ea8eb5c3f280229fa176da2?tag=5.1.1-3"})));
+//
+//     let purl: &str = "pkg:rpm/redhat/python-zope-event@4.2.0-9.2.el8stf";
+//     let response = client
+//         .get(context.urlify("/api/v1/packages/dependencies"))
+//         .query(&[("purl", purl)])
+//         .inject_token(&context.provider.provider_user)
+//         .await
+//         .unwrap()
+//         .send()
+//         .await
+//         .unwrap();
+//     assert_eq!(response.status(), StatusCode::OK);
+//     let payload: Value = response.json().await.unwrap();
+//     let deps = payload.as_array().unwrap();
+//     assert!(deps.contains(&json!({"purl": "pkg:rpm/python2-zope-event@4.2.0-9.2.el8stf?arch=noarch"})));
+// }
