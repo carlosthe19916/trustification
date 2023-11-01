@@ -156,7 +156,7 @@ async fn bombastic_search(context: &mut BombasticContext) {
     let response = wait_for_search_result(context, &[("q", &encode(&key))], |response| {
         response["total"].as_u64().unwrap() > 0
     })
-        .await;
+    .await;
     assert_eq!(response["result"][0]["document"]["name"], json!("ubi9-container"));
 }
 
@@ -195,7 +195,7 @@ async fn bombastic_reindexing(context: &mut BombasticContext) {
     let response = wait_for_search_result(context, &[("q", &encode(&key))], |response| {
         response["total"].as_u64().unwrap() > 0
     })
-        .await;
+    .await;
     assert_eq!(response["result"][0]["document"]["name"], json!("ubi9-container"));
 
     let now = OffsetDateTime::now_utc();
@@ -212,11 +212,11 @@ async fn bombastic_reindexing(context: &mut BombasticContext) {
                     .unwrap(),
                 format,
             )
-                .unwrap();
+            .unwrap();
             ts > now
         })
     })
-        .await;
+    .await;
 }
 
 #[test_context(BombasticContext)]
@@ -231,7 +231,7 @@ async fn bombastic_deletion(context: &mut BombasticContext) {
     let response = wait_for_search_result(context, &[("q", &encode(&key))], |response| {
         response["total"].as_u64().unwrap() > 0
     })
-        .await;
+    .await;
     assert_eq!(response["result"][0]["document"]["name"], json!("ubi9-container"));
 
     context.delete_sbom(&key).await;
@@ -239,7 +239,7 @@ async fn bombastic_deletion(context: &mut BombasticContext) {
     wait_for_search_result(context, &[("q", &encode(&key))], |response| {
         response["total"].as_u64().unwrap() == 1
     })
-        .await;
+    .await;
 }
 
 #[test_context(BombasticContext)]
