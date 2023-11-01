@@ -196,7 +196,7 @@ async fn spog_dependencies(context: &mut SpogContext) {
 
     loop {
         let response = client
-            .get(context.urlify("/api/v1/packages"))
+            .get(context.urlify("/api/v1/package/related"))
             .query(&[("purl", purl)])
             .inject_token(&context.provider.provider_user)
             .await
@@ -215,7 +215,7 @@ async fn spog_dependencies(context: &mut SpogContext) {
     }
 
     let response = client
-        .get(context.urlify("/api/v1/packages/dependents"))
+        .get(context.urlify("/api/v1/package/dependents"))
         .query(&[("purl", purl)])
         .inject_token(&context.provider.provider_user)
         .await
