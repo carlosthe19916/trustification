@@ -65,7 +65,6 @@ pub fn donut(props: &DonutProperties) -> Html {
     html!(<div style={props.style.clone()} ref={node}></div>)
 }
 
-
 #[derive(PartialEq, Properties)]
 pub struct SbomStackChartProperties {
     pub sboms: Value,

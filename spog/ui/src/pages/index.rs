@@ -4,7 +4,6 @@ use crate::{
 };
 use patternfly_yew::prelude::*;
 use search::search_input::SearchInput;
-use serde_json::json;
 use spog_ui_backend::{use_backend, SBOMService};
 use spog_ui_common::{components::SafeHtml, error::components::Error};
 use spog_ui_donut::SbomStackChart;
