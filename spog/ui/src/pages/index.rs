@@ -4,11 +4,16 @@ use crate::{
 };
 use patternfly_yew::prelude::*;
 use search::search_input::SearchInput;
-use spog_ui_common::components::SafeHtml;
+use serde_json::json;
+use spog_ui_backend::{use_backend, SBOMService};
+use spog_ui_common::{components::SafeHtml, error::components::Error};
+use spog_ui_donut::SbomStackChart;
 use spog_ui_navigation::AppRoute;
 use spog_ui_utils::{analytics::use_analytics, config::use_config_private};
 use yew::prelude::*;
+use yew_more_hooks::prelude::*;
 use yew_nested_router::prelude::*;
+use yew_oauth2::hook::use_latest_access_token;
 
 #[function_component(Index)]
 pub fn index() -> Html {
@@ -83,6 +88,29 @@ pub fn index() -> Html {
                         </Card>
                     </GridItem>
 
+                    <GridItem cols={[12]}>
+                        <Card>
+                            <CardTitle><Title size={Size::Medium}>{"Your dashboard"}</Title></CardTitle>
+                            <CardBody>
+                                <Grid gutter=true>
+                                    <GridItem cols={[6]}>
+                                        <Stack gutter=true>
+                                            <StackItem>
+                                                {"Below is a summary of CVE status for your last 10 ingested SBOMs. You can click on the SBOM name or CVE severity number below to be taken to their respective details page. You can also select up to 4 SBOMs to watch, by default you will see the last 4 SBOMs you have uploaded."}
+                                            </StackItem>
+                                            <StackItem>
+                                                <LastSbomsChart />
+                                            </StackItem>
+                                        </Stack>
+                                    </GridItem>
+                                    <GridItem cols={[6]}>
+                                        {"list"}
+                                    </GridItem>
+                                </Grid>
+                            </CardBody>
+                        </Card>
+                    </GridItem>
+
                     <SafeHtml html={config.landing_page.after_outer_content.clone()} />
 
                 </Grid>
@@ -91,6 +119,42 @@ pub fn index() -> Html {
 
             <SafeHtml html={config.landing_page.footer_content.clone()} />
 
+        </>
+    )
+}
+
+#[function_component(LastSbomsChart)]
+pub fn last_sboms_chart() -> Html {
+    let backend = use_backend();
+    let access_token = use_latest_access_token();
+
+    let sboms = use_async_with_cloned_deps(
+        |backend| async move {
+            SBOMService::new(backend.clone(), access_token)
+                .get_latest_with_vulns()
+                .await
+                .map(|result| serde_json::to_value(result).expect("Could not unparse latest sbom json"))
+        },
+        backend,
+    );
+
+    html!(
+        <>
+            {
+                match &*sboms {
+                    UseAsyncState::Pending | UseAsyncState::Processing => html!(
+                        <PageSection fill={PageSectionFill::Fill}>
+                            <Spinner />
+                        </PageSection>
+                    ),
+                    UseAsyncState::Ready(Ok(value)) => html!(
+                        <SbomStackChart sboms={value.clone()} style="height: 375px; width: 600px" />
+                    ),
+                    UseAsyncState::Ready(Err(_)) => html!(
+                        <Error title="Error" message="Error while uploading the file" />
+                    ),
+                }
+            }
         </>
     )
 }

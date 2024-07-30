@@ -146,11 +146,54 @@ pub async fn sboms_with_vulnerability_summary() -> actix_web::Result<HttpRespons
     let sbom3: SbomVulnerabilitySummary = SbomVulnerabilitySummary {
         sbom_id: "sbom3_id".into(),
         sbom_name: "sbom3".into(),
-        vulnerabilities: vulns3,
+        vulnerabilities: vulns3.clone(),
     };
+    let sbom4: SbomVulnerabilitySummary = SbomVulnerabilitySummary {
+        sbom_id: "sbom4_id".into(),
+        sbom_name: "sbom4".into(),
+        vulnerabilities: vulns3.clone(),
+    };
+    let sbom5: SbomVulnerabilitySummary = SbomVulnerabilitySummary {
+        sbom_id: "sbom5_id".into(),
+        sbom_name: "sbom5".into(),
+        vulnerabilities: vulns3.clone(),
+    };
+    let sbom6: SbomVulnerabilitySummary = SbomVulnerabilitySummary {
+        sbom_id: "sbom6_id".into(),
+        sbom_name: "sbom6".into(),
+        vulnerabilities: vulns3.clone(),
+    };
+    let sbom7: SbomVulnerabilitySummary = SbomVulnerabilitySummary {
+        sbom_id: "sbom7_id".into(),
+        sbom_name: "sbom7".into(),
+        vulnerabilities: vulns3.clone(),
+    };
+    let sbom8: SbomVulnerabilitySummary = SbomVulnerabilitySummary {
+        sbom_id: "sbom8_id".into(),
+        sbom_name: "sbom8".into(),
+        vulnerabilities: vulns3.clone(),
+    };
+    let sbom9: SbomVulnerabilitySummary = SbomVulnerabilitySummary {
+        sbom_id: "sbom9_id".into(),
+        sbom_name: "sbom9".into(),
+        vulnerabilities: vulns3.clone(),
+    };
+    let sbom10: SbomVulnerabilitySummary = SbomVulnerabilitySummary {
+        sbom_id: "sbom10_id".into(),
+        sbom_name: "sbom10".into(),
+        vulnerabilities: vulns3.clone(),
+    };
+
     summary.push(sbom1);
     summary.push(sbom2);
     summary.push(sbom3);
+    summary.push(sbom4);
+    summary.push(sbom5);
+    summary.push(sbom6);
+    summary.push(sbom7);
+    summary.push(sbom8);
+    summary.push(sbom9);
+    summary.push(sbom10);
 
     Ok(HttpResponse::Ok().json(summary))
 }
