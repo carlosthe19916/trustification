@@ -1,5 +1,5 @@
 use crate::{ApplyAccessToken, Backend, Endpoint};
-use spog_model::DashboardStatus;
+use spog_model::dashboard::DashboardStatus;
 use spog_ui_common::error::*;
 use std::rc::Rc;
 use yew_oauth2::prelude::*;
