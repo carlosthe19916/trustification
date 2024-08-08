@@ -15,6 +15,7 @@ mod sbom;
 mod search;
 mod suggestion;
 mod version;
+mod dashboard;
 
 pub use self::cve::*;
 pub use access_token::*;
@@ -29,6 +30,7 @@ pub use sbom::*;
 pub use search::*;
 pub use suggestion::*;
 pub use version::*;
+pub use dashboard::*;
 
 use url::Url;
 

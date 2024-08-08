@@ -1,16 +1,19 @@
+use std::rc::Rc;
+
 use crate::{
     analytics::{ActionAnalytics, AnalyticEvents, ObjectNameAnalytics},
     pages::search,
 };
 use patternfly_yew::prelude::*;
 use search::search_input::SearchInput;
-use spog_ui_backend::{use_backend, SBOMService};
+use spog_ui_backend::{use_backend, DashboardService, SBOMService};
 use spog_ui_common::{components::SafeHtml, error::components::Error};
 use spog_ui_donut::SbomStackChart;
-use spog_ui_navigation::AppRoute;
+use spog_ui_navigation::{AppRoute, View};
 use spog_ui_utils::{analytics::use_analytics, config::use_config_private};
 use yew::prelude::*;
 use yew_more_hooks::prelude::*;
+use yew_nested_router::components::Link;
 use yew_nested_router::prelude::*;
 use yew_oauth2::hook::use_latest_access_token;
 
@@ -103,7 +106,7 @@ pub fn index() -> Html {
                                         </Stack>
                                     </GridItem>
                                     <GridItem cols={[6]}>
-                                        {"list"}
+                                        <LastDataIngested />
                                     </GridItem>
                                 </Grid>
                             </CardBody>
@@ -148,6 +151,102 @@ pub fn last_sboms_chart() -> Html {
                     ),
                     UseAsyncState::Ready(Ok(value)) => html!(
                         <SbomStackChart sboms={value.clone()} style="height: 375px; width: 600px" />
+                    ),
+                    UseAsyncState::Ready(Err(_)) => html!(
+                        <Error title="Error" message="Error while uploading the file" />
+                    ),
+                }
+            }
+        </>
+    )
+}
+
+#[function_component(LastDataIngested)]
+pub fn last_data_ingested() -> Html {
+    let backend = use_backend();
+    let access_token = use_latest_access_token();
+
+    let summary = use_async_with_cloned_deps(
+        |backend| async move {
+            DashboardService::new(backend.clone(), access_token)
+                .get_summary()
+                .await
+                .map(Rc::new)
+        },
+        backend,
+    );
+
+    html!(
+        <>
+            {
+                match &*summary {
+                    UseAsyncState::Pending | UseAsyncState::Processing => html!(
+                        <PageSection fill={PageSectionFill::Fill}>
+                            <Spinner />
+                        </PageSection>
+                    ),
+                    UseAsyncState::Ready(Ok(value)) => html!(
+                        <Grid>
+                            <GridItem cols={[6]}>
+                                <DescriptionList>
+                                    <DescriptionGroup term="Last SBOM ingested">
+                                        <Stack>
+                                            <StackItem>
+                                                {&value.sbom_summary.last_updated_date}
+                                            </StackItem>
+                                            <StackItem>
+                                                if let Some(last_updated_sbom_id) = &value.sbom_summary.last_updated_sbom_id {
+                                                    <Link<AppRoute> to={AppRoute::Sbom(View::Content {id: last_updated_sbom_id.clone()})} >
+                                                        { &value.sbom_summary.last_updated_sbom_name }
+                                                    </Link<AppRoute>>
+                                                }
+                                            </StackItem>
+                                        </Stack>
+                                    </DescriptionGroup>
+                                    <DescriptionGroup term="Last Advisory ingested">
+                                        <Stack>
+                                            <StackItem>
+                                                {&value.csaf_summary.last_updated_date}
+                                            </StackItem>
+                                            <StackItem>
+                                                if let Some(last_updated_csaf_id) = &value.csaf_summary.last_updated_csaf_id {
+                                                    <Link<AppRoute> to={AppRoute::Advisory(View::Content {id: last_updated_csaf_id.clone()})} >
+                                                        { &value.csaf_summary.last_updated_csaf_name }
+                                                    </Link<AppRoute>>
+                                                }
+                                            </StackItem>
+                                        </Stack>
+                                    </DescriptionGroup>
+                                    <DescriptionGroup term="Last OSV update">
+                                        { &value.cve_summary.last_updated_cve }
+                                    </DescriptionGroup>
+                                    <DescriptionGroup term="Newest CVE ingested">
+                                        <Stack>
+                                            <StackItem>
+                                                {&value.cve_summary.last_updated_date}
+                                            </StackItem>
+                                            <StackItem>
+                                                if let Some(last_updated_cve) = &value.cve_summary.last_updated_cve {
+                                                    <Link<AppRoute> to={AppRoute::Cve(View::Content {id: last_updated_cve.clone()})} >
+                                                        { &value.cve_summary.last_updated_cve }
+                                                    </Link<AppRoute>>
+                                                }
+                                            </StackItem>
+                                        </Stack>
+                                    </DescriptionGroup>
+                                </DescriptionList>
+                            </GridItem>
+                            <GridItem cols={[6]}>
+                                <DescriptionList>
+                                    <DescriptionGroup term="Total SBOMs">
+                                        {value.sbom_summary.total_sboms}
+                                    </DescriptionGroup>
+                                    <DescriptionGroup term="Total Advisories">
+                                        {value.csaf_summary.total_csafs}
+                                    </DescriptionGroup>
+                                </DescriptionList>
+                            </GridItem>
+                        </Grid>
                     ),
                     UseAsyncState::Ready(Err(_)) => html!(
                         <Error title="Error" message="Error while uploading the file" />
