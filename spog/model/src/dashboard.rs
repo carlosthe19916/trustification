@@ -1,26 +1,12 @@
-pub mod config;
-pub mod csaf;
-pub mod cve;
-pub mod dashboard;
-pub mod package_info;
-pub mod pkg;
-pub mod search;
-pub mod suggestion;
-pub mod vuln;
-
-pub mod prelude {
-    pub use crate::{config::*, cve::*, dashboard::*, package_info::*, pkg::*, search::*, suggestion::*, vuln::*};
-}
-
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct DashboardStatus {
-    pub sbom_summary: SbomSummary,
-    pub csaf_summary: CSAFSummary,
-    pub cve_summary: CveSummary,
+    pub sbom_summary: SbomStatus,
+    pub csaf_summary: CSAFStatus,
+    pub cve_summary: CveStatus,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-pub struct SbomSummary {
+pub struct SbomStatus {
     /// Total number of all documents
     pub total_sboms: Option<u64>,
     /// Id of last updated doc
@@ -32,7 +18,7 @@ pub struct SbomSummary {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-pub struct CSAFSummary {
+pub struct CSAFStatus {
     /// Total number of all documents
     pub total_csafs: Option<u64>,
     /// Id of last updated doc
@@ -44,7 +30,7 @@ pub struct CSAFSummary {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-pub struct CveSummary {
+pub struct CveStatus {
     /// Total number of all documents
     pub total_cves: Option<u64>,
     /// Name of last updated doc
