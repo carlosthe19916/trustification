@@ -217,10 +217,7 @@ pub fn last_data_ingested() -> Html {
                                             </StackItem>
                                         </Stack>
                                     </DescriptionGroup>
-                                    <DescriptionGroup term="Last OSV update">
-                                        { &value.cve_summary.last_updated_cve }
-                                    </DescriptionGroup>
-                                    <DescriptionGroup term="Newest CVE ingested">
+                                    <DescriptionGroup term="Last CVE ingested">
                                         <Stack>
                                             <StackItem>
                                                 {&value.cve_summary.last_updated_date}
@@ -243,6 +240,9 @@ pub fn last_data_ingested() -> Html {
                                     </DescriptionGroup>
                                     <DescriptionGroup term="Total Advisories">
                                         {value.csaf_summary.total_csafs}
+                                    </DescriptionGroup>
+                                    <DescriptionGroup term="Total CVEs">
+                                        {value.cve_summary.total_cves}
                                     </DescriptionGroup>
                                 </DescriptionList>
                             </GridItem>
