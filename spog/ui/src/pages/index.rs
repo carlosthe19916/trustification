@@ -7,7 +7,7 @@ use crate::{
 use patternfly_yew::prelude::*;
 use search::search_input::SearchInput;
 use spog_ui_backend::{use_backend, DashboardService, SBOMService};
-use spog_ui_common::{components::SafeHtml, error::components::Error};
+use spog_ui_common::{components::SafeHtml, error::components::Error, utils::time::date};
 use spog_ui_donut::SbomStackChart;
 use spog_ui_navigation::{AppRoute, View};
 use spog_ui_utils::{analytics::use_analytics, config::use_config_private};
@@ -192,7 +192,9 @@ pub fn last_data_ingested() -> Html {
                                     <DescriptionGroup term="Last SBOM ingested">
                                         <Stack>
                                             <StackItem>
-                                                {&value.sbom_summary.last_updated_date}
+                                                if let Some(last_updated_date) = &value.sbom_summary.last_updated_date {
+                                                   {date(last_updated_date.clone())}
+                                                }
                                             </StackItem>
                                             <StackItem>
                                                 if let Some(last_updated_sbom_id) = &value.sbom_summary.last_updated_sbom_id {
@@ -206,7 +208,9 @@ pub fn last_data_ingested() -> Html {
                                     <DescriptionGroup term="Last Advisory ingested">
                                         <Stack>
                                             <StackItem>
-                                                {&value.csaf_summary.last_updated_date}
+                                                if let Some(last_updated_date) = &value.csaf_summary.last_updated_date {
+                                                    {date(last_updated_date.clone())}
+                                                }
                                             </StackItem>
                                             <StackItem>
                                                 if let Some(last_updated_csaf_id) = &value.csaf_summary.last_updated_csaf_id {
@@ -220,7 +224,9 @@ pub fn last_data_ingested() -> Html {
                                     <DescriptionGroup term="Last CVE ingested">
                                         <Stack>
                                             <StackItem>
-                                                {&value.cve_summary.last_updated_date}
+                                                if let Some(last_updated_date) = &value.cve_summary.last_updated_date {
+                                                    {date(last_updated_date.clone())}
+                                                }
                                             </StackItem>
                                             <StackItem>
                                                 if let Some(last_updated_cve) = &value.cve_summary.last_updated_cve {
