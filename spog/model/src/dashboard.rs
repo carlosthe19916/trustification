@@ -1,3 +1,5 @@
+use time::OffsetDateTime;
+
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct DashboardStatus {
     pub sbom_summary: SbomStatus,
@@ -14,7 +16,7 @@ pub struct SbomStatus {
     /// name of last updated doc
     pub last_updated_sbom_name: Option<String>,
     /// Updated time of last updated doc
-    pub last_updated_date: Option<String>,
+    pub last_updated_date: Option<OffsetDateTime>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
@@ -26,7 +28,7 @@ pub struct CSAFStatus {
     /// name of last updated doc
     pub last_updated_csaf_name: Option<String>,
     /// Updated time of last updated doc
-    pub last_updated_date: Option<String>,
+    pub last_updated_date: Option<OffsetDateTime>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
@@ -36,5 +38,5 @@ pub struct CveStatus {
     /// Name of last updated doc
     pub last_updated_cve: Option<String>,
     /// Updated time of last updated doc
-    pub last_updated_date: Option<String>,
+    pub last_updated_date: Option<OffsetDateTime>,
 }

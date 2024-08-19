@@ -6,8 +6,6 @@ use actix_web::{web, HttpResponse};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use spog_model::dashboard::{CSAFStatus, CveStatus, DashboardStatus, SbomStatus};
 use std::sync::Arc;
-use time::macros::format_description;
-use time::OffsetDateTime;
 use tracing::instrument;
 use trustification_api::search::SearchOptions;
 use trustification_auth::authenticator::Authenticator;
@@ -52,34 +50,20 @@ pub async fn get_status(
             total_sboms: sbom_status_result.total,
             last_updated_sbom_id: sbom_status_result.last_updated_sbom_id,
             last_updated_sbom_name: sbom_status_result.last_updated_sbom_name,
-            last_updated_date: get_date(sbom_status_result.last_updated_date),
+            last_updated_date: sbom_status_result.last_updated_date,
         },
         csaf_summary: CSAFStatus {
             total_csafs: vex_status_result.total,
             last_updated_csaf_id: vex_status_result.last_updated_vex_id,
             last_updated_csaf_name: vex_status_result.last_updated_vex_name,
-            last_updated_date: get_date(vex_status_result.last_updated_date),
+            last_updated_date: vex_status_result.last_updated_date,
         },
         cve_summary: CveStatus {
             total_cves: cve_status_result.total,
             last_updated_cve: cve_status_result.last_updated_cve_id,
-            last_updated_date: get_date(cve_status_result.last_updated_date),
+            last_updated_date: cve_status_result.last_updated_date,
         },
     };
 
     Ok(HttpResponse::Ok().json(status))
-}
-
-fn get_date(date: Option<OffsetDateTime>) -> Option<String> {
-    let fmt = format_description!("[month]-[day]-[year]:[hour]:[minute]:[second] ");
-
-    if let Some(dt) = date {
-        let date = dt.date();
-        Some(date.format(fmt).unwrap_or_else(|err| {
-            log::info!("Failed to format date: {err}");
-            date.to_string()
-        }))
-    } else {
-        None
-    }
 }
