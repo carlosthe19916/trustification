@@ -10,6 +10,9 @@ use spog_ui_backend::{use_backend, DashboardService, SBOMService};
 use spog_ui_common::{components::SafeHtml, error::components::Error, utils::time::date};
 use spog_ui_donut::SbomStackChart;
 use spog_ui_navigation::{AppRoute, View};
+use spog_ui_backend::{use_backend, DashboardService};
+use spog_ui_common::{components::SafeHtml, error::components::Error, utils::time::full_utc_date};
+use spog_ui_navigation::{AppRoute, View};
 use spog_ui_utils::{analytics::use_analytics, config::use_config_private};
 use yew::prelude::*;
 use yew_more_hooks::prelude::*;
@@ -86,6 +89,29 @@ pub fn index() -> Html {
                                 </form>
                                 <SafeHtml html={config.landing_page.after_inner_content.clone()} />
 
+                            </CardBody>
+                        </Card>
+                    </GridItem>
+
+                    <GridItem cols={[12]}>
+                        <Card>
+                            <CardTitle><Title size={Size::Medium}>{"Your dashboard"}</Title></CardTitle>
+                            <CardBody>
+                                <Grid gutter=true>
+                                    <GridItem cols={[6]}>
+                                        <Stack gutter=true>
+                                            <StackItem>
+                                                {"Below is a summary of CVE status for your last 10 ingested SBOMs. You can click on the SBOM name or CVE severity number below to be taken to their respective details page. You can also select up to 4 SBOMs to watch, by default you will see the last 4 SBOMs you have uploaded."}
+                                            </StackItem>
+                                            <StackItem>
+                                                // <LastSbomsChart />
+                                            </StackItem>
+                                        </Stack>
+                                    </GridItem>
+                                    <GridItem cols={[6]}>
+                                        <LastDataIngested />
+                                    </GridItem>
+                                </Grid>
                             </CardBody>
                         </Card>
                     </GridItem>
@@ -193,7 +219,7 @@ pub fn last_data_ingested() -> Html {
                                         <Stack>
                                             <StackItem>
                                                 if let Some(last_updated_date) = &value.sbom_summary.last_updated_date {
-                                                   {date(last_updated_date.clone())}
+                                                   {full_utc_date(*last_updated_date)}
                                                 }
                                             </StackItem>
                                             <StackItem>
@@ -209,7 +235,7 @@ pub fn last_data_ingested() -> Html {
                                         <Stack>
                                             <StackItem>
                                                 if let Some(last_updated_date) = &value.csaf_summary.last_updated_date {
-                                                    {date(last_updated_date.clone())}
+                                                    {full_utc_date(*last_updated_date)}
                                                 }
                                             </StackItem>
                                             <StackItem>
@@ -225,7 +251,7 @@ pub fn last_data_ingested() -> Html {
                                         <Stack>
                                             <StackItem>
                                                 if let Some(last_updated_date) = &value.cve_summary.last_updated_date {
-                                                    {date(last_updated_date.clone())}
+                                                    {full_utc_date(*last_updated_date)}
                                                 }
                                             </StackItem>
                                             <StackItem>
